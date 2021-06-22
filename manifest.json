@@ -19,12 +19,5 @@
     "options_ui": {
         "page": "options.html",
         "open_in_tab": false
-    },
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "addon@example.com",
-            "strict_min_version": "42.0"
-        }
-    },
-    "content_security_policy": "script-src 'self' https://www.drupal.org/; object-src 'self'"
+    }
 }
