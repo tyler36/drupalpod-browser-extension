@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const issueBranch = 'DP_ISSUE_BRANCH=' + getSelectValue('issue-branch');
         const projectType = 'DP_PROJECT_TYPE=' + document.getElementById('project-type').innerText;
         const coreVersion = 'DP_CORE_VERSION=' + getSelectValue('core-version');
-        const patchFile = 'DP_PATCH_FILE=' + getSelectValue('available-patches');
+        const patchFile = 'DP_PATCH_FILE=' + encodeURIComponent(getSelectValue('available-patches'));
         const installProfile = 'DP_INSTALL_PROFILE=' + (getSelectValue('install-profile') === '(none)' ? "\'\'" : getSelectValue('install-profile'));
 
         chrome.tabs.create({
