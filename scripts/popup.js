@@ -161,8 +161,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function getSelectValue(id) {
-    var selectElement = document.getElementById(id);
-    return selectElement.options[ selectElement.selectedIndex ].value;
+    const selectElement = document.getElementById(id);
+    if (selectElement.options[ selectElement.selectedIndex ]) {
+        return selectElement.options[ selectElement.selectedIndex ].value
+    }
+    return '';
 }
 
 function getPatchesFromLinks(linksArray) {
