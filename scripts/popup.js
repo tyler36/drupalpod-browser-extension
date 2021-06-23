@@ -149,6 +149,8 @@ document.addEventListener('DOMContentLoaded', function() {
             ',' +
             coreVersion +
             ',' +
+            patchFile +
+            ',' +
             installProfile +
             '/' +
             envRepo
