@@ -107,7 +107,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const drupalInstallProfiles = ['(none)', 'standard', 'demo_umami', 'minimal'];
         const availablePatchesArray = getPatchesFromLinks(pageResults.allHrefs);
 
-        console.log('typeof: ',typeof availablePatchesArray);
         populateSelectList('issue-branch', pageResults.issueBranches);
         populateSelectList('core-version', drupalCoreVersionsArray);
         populateSelectList('install-profile', drupalInstallProfiles);
@@ -125,20 +124,17 @@ document.addEventListener('DOMContentLoaded', function() {
         openDevEnv();
     });
 
-    function openNewTab(baseUrl, projectName, issueFork, issueBranch, projectType, coreVersion, installProfile, envRepo) {
-
-    }
-
     function openDevEnv() {
         // Build URL structure to open Gitpod
 
         const baseUrl = 'https://gitpod.io/#';
         const envRepo = document.getElementById('devdrupalpod').innerText;
         const projectName = 'DP_PROJECT_NAME=' + document.getElementById('project-name').innerText;
-        const issueFork = 'DP_ISSUE_FORK=' + document.getElementById('issue-fork').innerText;
+        const issueFork = 'DP_ISSUE_FORK=' + (document.getElementById('issue-fork').innerText === 'false' ? '' : document.getElementById('issue-fork').innerText);
         const issueBranch = 'DP_ISSUE_BRANCH=' + getSelectValue('issue-branch');
         const projectType = 'DP_PROJECT_TYPE=' + document.getElementById('project-type').innerText;
         const coreVersion = 'DP_CORE_VERSION=' + getSelectValue('core-version');
+        const patchFile = 'DP_PATCH_FILE=' + getSelectValue('available-patches');
         const installProfile = 'DP_INSTALL_PROFILE=' + (getSelectValue('install-profile') === '(none)' ? "\'\'" : getSelectValue('install-profile'));
 
         chrome.tabs.create({
