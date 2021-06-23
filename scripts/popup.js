@@ -47,7 +47,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const allBranches = document.querySelector('.branches') ? document.querySelector('.branches').children : false;
 
             // Get links to find patches
-            const allLinks = document.querySelector('a');
+            const allLinks = document.querySelectorAll('a');
+            const duplicateAllHrefs = [];
+            for (let i = 0; i < allLinks.length; i++) {
+                if (allLinks[i].attributes.href) {
+                    duplicateAllHrefs.push(allLinks[i].attributes.href.nodeValue);
+                }
+            }
+            // Remove duplicate Hrefs
+            const allHrefs = [...new Set(duplicateAllHrefs)];
+
             const issueBranches = [];
             Array.from(allBranches).forEach((element) => {
                 issueBranches.push(element.dataset.branch);
@@ -60,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 success: true,
                 pathArray: pathArray,
                 issueFork: issueFork,
-                allLinks: allLinks,
+                allHrefs: allHrefs,
                 issueBranches: issueBranches,
                 loggedIn: loggedIn,
                 pushAccess: pushAccess,
@@ -71,43 +80,43 @@ document.addEventListener('DOMContentLoaded', function() {
     function populateIssueFork(pageResults) {
         if (!pageResults.loggedIn) {
             displayWarning('not-logged-in-instructions');
-            return;
         }
 
         // Check if issue fork found in the page
-        if (pageResults.issueFork) {
-            if (!pageResults.pushAccess) {
-                displayWarning('no-push-access-instructions');
-                return;
-            }
-
-            const projectName = pageResults.pathArray[2];
-            const projectNameStatus = document.getElementById('project-name');
-            projectNameStatus.innerHTML = projectName;
-
-            getProjectType(projectName).then((projectType) => {
-                const projectTypeStatus = document.getElementById('project-type');
-                projectTypeStatus.innerHTML = projectType;
-            });
-
-            const issueForkStatus = document.getElementById('issue-fork');
-            issueForkStatus.innerHTML = pageResults.issueFork;
-
-            const drupalCoreVersionsArray = ['9.2.0', '8.9.x', '9.0.x', '9.1.x', '9.2.x', '9.3.x'];
-            const drupalInstallProfiles = ['(none)', 'standard', 'demo_umami', 'minimal'];
-            const availablePatchesArray = getPatchesFromLinks(pageResults.allLinks);
-
-            populateSelectList('issue-branch', pageResults.issueBranches);
-            populateSelectList('core-version', drupalCoreVersionsArray);
-            populateSelectList('install-profile', drupalInstallProfiles);
-            populateSelectList('available-patches', availablePatchesArray);
-
-            // Display form
-            const formSelectionElement = document.querySelector('.form-selection');
-            formSelectionElement.classList.remove('hidden');
-        } else {
+        if (!pageResults.issueFork) {
             displayWarning('no-issue-fork-instructions');
         }
+
+        if (!pageResults.pushAccess) {
+            displayWarning('no-push-access-instructions');
+        }
+
+        const projectName = pageResults.pathArray[2];
+        const projectNameStatus = document.getElementById('project-name');
+        projectNameStatus.innerHTML = projectName;
+
+        getProjectType(projectName).then((projectType) => {
+            const projectTypeStatus = document.getElementById('project-type');
+            projectTypeStatus.innerHTML = projectType;
+        });
+
+        const issueForkStatus = document.getElementById('issue-fork');
+        issueForkStatus.innerHTML = pageResults.issueFork;
+
+        const drupalCoreVersionsArray = ['9.2.0', '8.9.x', '9.0.x', '9.1.x', '9.2.x', '9.3.x'];
+        const drupalInstallProfiles = ['(none)', 'standard', 'demo_umami', 'minimal'];
+        const availablePatchesArray = getPatchesFromLinks(pageResults.allHrefs);
+
+        console.log('typeof: ',typeof availablePatchesArray);
+        populateSelectList('issue-branch', pageResults.issueBranches);
+        populateSelectList('core-version', drupalCoreVersionsArray);
+        populateSelectList('install-profile', drupalInstallProfiles);
+        populateSelectList('available-patches', availablePatchesArray);
+
+        // Display form
+        const formSelectionElement = document.querySelector('.form-selection');
+        formSelectionElement.classList.remove('hidden');
+
     }
 
     // activate button
@@ -159,18 +168,13 @@ function getSelectValue(id) {
 }
 
 function getPatchesFromLinks(linksArray) {
-    const regex = /^https:\/\/www\.drupal\.org\/files\/issues\/.*\.patch$/;
-    // linksArray.map
-    const str = `https://www.drupal.org/files/issues/2021-04-22/scheduler-stop-unpublishing-on-scheduled-publish-3210321-1.patch`;
-    let m;
-
-    // const numbers = [1, 2, 3, 4];
-    // const evens = numbers.filter(item => item % 2 === 0);
+    const patchesRegex = /^https:\/\/www\.drupal\.org\/files\/issues\/.*\.patch$/;
     const patchesFound = linksArray.filter(item => {
-        return regex.exec(str);
+        return (patchesRegex.exec(item) !== null);
     });
 
-    console.log('patchesFound', patchesFound);
+    patchesFound.unshift('');
+    return patchesFound;
 }
 
 function displayWarning(className) {
