@@ -46,6 +46,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const issueFork = document.querySelector('.fork-link') ? document.querySelector('.fork-link').innerText : false;
             const allBranches = document.querySelector('.branches') ? document.querySelector('.branches').children : false;
 
+            // Get links to find patches
+            const allLinks = document.querySelectorAll('a');
+            const duplicateAllHrefs = [];
+            for (let i = 0; i < allLinks.length; i++) {
+                if (allLinks[i].attributes.href) {
+                    duplicateAllHrefs.push(allLinks[i].attributes.href.nodeValue);
+                }
+            }
+            // Remove duplicate Hrefs
+            const allHrefs = [...new Set(duplicateAllHrefs)];
+
             const issueBranches = [];
             Array.from(allBranches).forEach((element) => {
                 issueBranches.push(element.dataset.branch);
@@ -58,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 success: true,
                 pathArray: pathArray,
                 issueFork: issueFork,
+                allHrefs: allHrefs,
                 issueBranches: issueBranches,
                 loggedIn: loggedIn,
                 pushAccess: pushAccess,
@@ -68,41 +80,42 @@ document.addEventListener('DOMContentLoaded', function() {
     function populateIssueFork(pageResults) {
         if (!pageResults.loggedIn) {
             displayWarning('not-logged-in-instructions');
-            return;
         }
 
         // Check if issue fork found in the page
-        if (pageResults.issueFork) {
-            if (!pageResults.pushAccess) {
-                displayWarning('no-push-access-instructions');
-                return;
-            }
-
-            const projectName = pageResults.pathArray[2];
-            const projectNameStatus = document.getElementById('project-name');
-            projectNameStatus.innerHTML = projectName;
-
-            getProjectType(projectName).then((projectType) => {
-                const projectTypeStatus = document.getElementById('project-type');
-                projectTypeStatus.innerHTML = projectType;
-            });
-
-            const issueForkStatus = document.getElementById('issue-fork');
-            issueForkStatus.innerHTML = pageResults.issueFork;
-
-            const drupalCoreVersionsArray = ['9.2.0', '8.9.x', '9.0.x', '9.1.x', '9.2.x', '9.3.x'];
-            const drupalInstallProfiles = ['(none)', 'standard', 'demo_umami', 'minimal'];
-
-            populateSelectList('issue-branch', pageResults.issueBranches);
-            populateSelectList('core-version', drupalCoreVersionsArray);
-            populateSelectList('install-profile', drupalInstallProfiles);
-
-            // Display form
-            const formSelectionElement = document.querySelector('.form-selection');
-            formSelectionElement.classList.remove('hidden');
-        } else {
+        if (!pageResults.issueFork) {
             displayWarning('no-issue-fork-instructions');
         }
+
+        if (!pageResults.pushAccess) {
+            displayWarning('no-push-access-instructions');
+        }
+
+        const projectName = pageResults.pathArray[2];
+        const projectNameStatus = document.getElementById('project-name');
+        projectNameStatus.innerHTML = projectName;
+
+        getProjectType(projectName).then((projectType) => {
+            const projectTypeStatus = document.getElementById('project-type');
+            projectTypeStatus.innerHTML = projectType;
+        });
+
+        const issueForkStatus = document.getElementById('issue-fork');
+        issueForkStatus.innerHTML = pageResults.issueFork;
+
+        const drupalCoreVersionsArray = ['9.2.0', '8.9.x', '9.0.x', '9.1.x', '9.2.x', '9.3.x'];
+        const drupalInstallProfiles = ['(none)', 'standard', 'demo_umami', 'minimal'];
+        const availablePatchesArray = getPatchesFromLinks(pageResults.allHrefs);
+
+        populateSelectList('issue-branch', pageResults.issueBranches);
+        populateSelectList('core-version', drupalCoreVersionsArray);
+        populateSelectList('install-profile', drupalInstallProfiles);
+        populateSelectList('available-patches', availablePatchesArray);
+
+        // Display form
+        const formSelectionElement = document.querySelector('.form-selection');
+        formSelectionElement.classList.remove('hidden');
+
     }
 
     // activate button
@@ -111,20 +124,17 @@ document.addEventListener('DOMContentLoaded', function() {
         openDevEnv();
     });
 
-    function openNewTab(baseUrl, projectName, issueFork, issueBranch, projectType, coreVersion, installProfile, envRepo) {
-
-    }
-
     function openDevEnv() {
         // Build URL structure to open Gitpod
 
         const baseUrl = 'https://gitpod.io/#';
         const envRepo = document.getElementById('devdrupalpod').innerText;
         const projectName = 'DP_PROJECT_NAME=' + document.getElementById('project-name').innerText;
-        const issueFork = 'DP_ISSUE_FORK=' + document.getElementById('issue-fork').innerText;
+        const issueFork = 'DP_ISSUE_FORK=' + (document.getElementById('issue-fork').innerText === 'false' ? '' : document.getElementById('issue-fork').innerText);
         const issueBranch = 'DP_ISSUE_BRANCH=' + getSelectValue('issue-branch');
         const projectType = 'DP_PROJECT_TYPE=' + document.getElementById('project-type').innerText;
         const coreVersion = 'DP_CORE_VERSION=' + getSelectValue('core-version');
+        const patchFile = 'DP_PATCH_FILE=' + encodeURIComponent(getSelectValue('available-patches'));
         const installProfile = 'DP_INSTALL_PROFILE=' + (getSelectValue('install-profile') === '(none)' ? "\'\'" : getSelectValue('install-profile'));
 
         chrome.tabs.create({
@@ -139,6 +149,8 @@ document.addEventListener('DOMContentLoaded', function() {
             ',' +
             coreVersion +
             ',' +
+            patchFile +
+            ',' +
             installProfile +
             '/' +
             envRepo
@@ -149,8 +161,21 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function getSelectValue(id) {
-    var selectElement = document.getElementById(id);
-    return selectElement.options[ selectElement.selectedIndex ].value;
+    const selectElement = document.getElementById(id);
+    if (selectElement.options[ selectElement.selectedIndex ]) {
+        return selectElement.options[ selectElement.selectedIndex ].value
+    }
+    return '';
+}
+
+function getPatchesFromLinks(linksArray) {
+    const patchesRegex = /^https:\/\/www\.drupal\.org\/files\/issues\/.*\.patch$/;
+    const patchesFound = linksArray.filter(item => {
+        return (patchesRegex.exec(item) !== null);
+    });
+
+    patchesFound.unshift('');
+    return patchesFound;
 }
 
 function displayWarning(className) {

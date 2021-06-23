@@ -1,12 +1,12 @@
 .container {
   padding: 1em;
-  min-height: 10em;
-  width: 400px;
-  height: 320px;
+  width: 25em;
+  height: 30em;
 }
 
 .logo {
   float: right;
+  padding-left: 2em;
 }
 
 p {
