@@ -46,6 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const issueFork = document.querySelector('.fork-link') ? document.querySelector('.fork-link').innerText : false;
             const allBranches = document.querySelector('.branches') ? document.querySelector('.branches').children : false;
 
+            // Get links to find patches
+            const allLinks = document.querySelector('a');
             const issueBranches = [];
             Array.from(allBranches).forEach((element) => {
                 issueBranches.push(element.dataset.branch);
@@ -58,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 success: true,
                 pathArray: pathArray,
                 issueFork: issueFork,
+                allLinks: allLinks,
                 issueBranches: issueBranches,
                 loggedIn: loggedIn,
                 pushAccess: pushAccess,
@@ -92,10 +95,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const drupalCoreVersionsArray = ['9.2.0', '8.9.x', '9.0.x', '9.1.x', '9.2.x', '9.3.x'];
             const drupalInstallProfiles = ['(none)', 'standard', 'demo_umami', 'minimal'];
+            const availablePatchesArray = getPatchesFromLinks(pageResults.allLinks);
 
             populateSelectList('issue-branch', pageResults.issueBranches);
             populateSelectList('core-version', drupalCoreVersionsArray);
             populateSelectList('install-profile', drupalInstallProfiles);
+            populateSelectList('available-patches', availablePatchesArray);
 
             // Display form
             const formSelectionElement = document.querySelector('.form-selection');
@@ -151,6 +156,21 @@ document.addEventListener('DOMContentLoaded', function() {
 function getSelectValue(id) {
     var selectElement = document.getElementById(id);
     return selectElement.options[ selectElement.selectedIndex ].value;
+}
+
+function getPatchesFromLinks(linksArray) {
+    const regex = /^https:\/\/www\.drupal\.org\/files\/issues\/.*\.patch$/;
+    // linksArray.map
+    const str = `https://www.drupal.org/files/issues/2021-04-22/scheduler-stop-unpublishing-on-scheduled-publish-3210321-1.patch`;
+    let m;
+
+    // const numbers = [1, 2, 3, 4];
+    // const evens = numbers.filter(item => item % 2 === 0);
+    const patchesFound = linksArray.filter(item => {
+        return regex.exec(str);
+    });
+
+    console.log('patchesFound', patchesFound);
 }
 
 function displayWarning(className) {
