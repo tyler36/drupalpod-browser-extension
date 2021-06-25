@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkURL(url) {
         // Run only on Drupal issues pages, otherwise display a message
         // const projectPageRegex = /(https:\/\/www.drupal.org\/project\/)\w+\/?$/gm;
-        const projectIssuePageRegex = /(https:\/\/www.drupal.org\/project\/)\w+(\/issues\/)\d+\/?$/gm;
+        const projectIssuePageRegex = /(https:\/\/www.drupal.org\/project\/)\w+(\/issues\/)\d+/gm;
 
         if (projectIssuePageRegex.exec(url) !== null) {
             readIssueContent();
