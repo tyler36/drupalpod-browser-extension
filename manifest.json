@@ -3,7 +3,7 @@
     "name": "DrupalPod helper extension",
     "description": "This extension set up a development environment for Drupal contributions",
     "version": "1.0.2",
-    "homepage_url": "https://shaal.github.io/drupalpod",
+    "homepage_url": "https://www.drupalpod.com",
     "browser_action": {
         "default_icon": "icons/DrupalPod-128x128.png",
         "default_popup": "popup.html",
