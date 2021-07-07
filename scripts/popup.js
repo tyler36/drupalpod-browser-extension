@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 issueBranches.push(element.dataset.branch);
             });
 
+            const moduleVersion = document.querySelector('.field-name-field-issue-version').children[1].innerText.replace('-dev','');
             const loggedIn = document.querySelector('.person') ? true : false;
             const pushAccess = document.querySelector('.push-access') ? true : false;
 
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 issueFork: issueFork,
                 allHrefs: allHrefs,
                 issueBranches: issueBranches,
+                moduleVersion: moduleVersion,
                 loggedIn: loggedIn,
                 pushAccess: pushAccess,
             };
@@ -103,6 +105,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const issueForkStatus = document.getElementById('issue-fork');
         issueForkStatus.innerHTML = pageResults.issueFork;
 
+        const moduleVersionStatus = document.getElementById('module-version');
+        moduleVersionStatus.innerHTML = pageResults.moduleVersion;
+
         const drupalCoreVersionsArray = ['9.2.0', '8.9.x', '9.0.x', '9.1.x', '9.2.x', '9.3.x'];
         const drupalInstallProfiles = ['(none)', 'standard', 'demo_umami', 'minimal'];
         const availablePatchesArray = getPatchesFromLinks(pageResults.allHrefs);
@@ -133,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const issueFork = 'DP_ISSUE_FORK=' + (document.getElementById('issue-fork').innerText === 'false' ? '' : document.getElementById('issue-fork').innerText);
         const issueBranch = 'DP_ISSUE_BRANCH=' + getSelectValue('issue-branch');
         const projectType = 'DP_PROJECT_TYPE=' + document.getElementById('project-type').innerText;
+        const moduleVersion = 'DP_MODULE_VERSION=' + document.getElementById('module-version').innerText;
         const coreVersion = 'DP_CORE_VERSION=' + getSelectValue('core-version');
         const patchFile = 'DP_PATCH_FILE=' + encodeURIComponent(getSelectValue('available-patches'));
         const installProfile = 'DP_INSTALL_PROFILE=' + (getSelectValue('install-profile') === '(none)' ? "\'\'" : getSelectValue('install-profile'));
@@ -146,6 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
             issueBranch +
             ',' +
             projectType +
+            ',' +
+            moduleVersion +
             ',' +
             coreVersion +
             ',' +
