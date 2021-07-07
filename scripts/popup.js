@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
             Array.from(allBranches).forEach((element) => {
                 issueBranches.push(element.dataset.branch);
             });
+            issueBranches.unshift('');
 
             const moduleVersion = document.querySelector('.field-name-field-issue-version').children[1].innerText.replace('-dev','');
             const loggedIn = document.querySelector('.person') ? true : false;
