@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const envRepo = document.getElementById('devdrupalpod').innerText;
         const projectName = 'DP_PROJECT_NAME=' + document.getElementById('project-name').innerText;
         const issueFork = 'DP_ISSUE_FORK=' + (document.getElementById('issue-fork').innerText === 'false' ? '' : document.getElementById('issue-fork').innerText);
-        const issueBranch = 'DP_ISSUE_BRANCH=' + getSelectValue('issue-branch');
+        const issueBranch = 'DP_ISSUE_BRANCH=' + encodeURIComponent(getSelectValue('issue-branch'));
         const projectType = 'DP_PROJECT_TYPE=' + document.getElementById('project-type').innerText;
         const moduleVersion = 'DP_MODULE_VERSION=' + document.getElementById('module-version').innerText;
         const coreVersion = 'DP_CORE_VERSION=' + getSelectValue('core-version');
