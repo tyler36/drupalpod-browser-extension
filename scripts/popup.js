@@ -1,3 +1,6 @@
+const defaultDrupalCore = '10.1.x';
+const defaultProfile = 'standard';
+
 document.addEventListener('DOMContentLoaded', function() {
     // Removed because we use only a specific main repo.
     // getDrupalPodRepo();
@@ -115,8 +118,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const availablePatchesArray = getPatchesFromLinks(pageResults.allHrefs);
 
         populateSelectList('issue-branch', pageResults.issueBranches);
-        populateSelectList('core-version', drupalCoreVersionsArray);
-        populateSelectList('install-profile', drupalInstallProfiles, 'standard');
+        populateSelectList('core-version', drupalCoreVersionsArray, defaultDrupalCore);
+        populateSelectList('install-profile', drupalInstallProfiles, defaultProfile);
         populateSelectList('available-patches', availablePatchesArray);
 
         // Display form
